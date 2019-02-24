@@ -1,12 +1,11 @@
 'use strict';
-
-// Dependencies
-const { ipcRenderer } = require('electron');
+/* global remote_close, remote_download, remote_markdown, remote_ondragstart, remote_open  */
 
 // Module imports
 const unsplash = require('./util/unsplash');
 const canvas = require('./util/canvas');
-const imgur = require('./util/imgur'); 
+const imgur = require('./util/imgur');
+
 
 //Variables for Dom references
 const enter = document.getElementById('enter');
@@ -28,67 +27,62 @@ const main = document.getElementById('main');
 enter.onclick = (event) => {
 	event.preventDefault();
 
-	if(!drag.getAttribute('src')){
+	if (!drag.getAttribute('src')) {
 		loadImage();
 	}
 
 	main.style = 'display:inline-flex;';
 	enter.style = 'display:none';
 
-	ipcRenderer.send('open');
+	remote_open();
 };
 
-// Event to search image by keyword 
+// Event to search image by keyword
 keyword.onkeydown = (event) => {
 	if (event.keyCode === 13) {
 		loadImage(event.currentTarget.value);
 	}
 };
 
-// Event to load new image 
+// Event to load new image
 reload.onclick = (event) => {
 	event.preventDefault();
 
 	loadImage(keyword.value);
 };
 
-// Event to minimize main window 
+// Event to minimize main window
 minimize.onclick = (event) => {
 	event.preventDefault();
 	main.style = 'display:none';
 	enter.style = 'display:block';
-	ipcRenderer.send('close');
+	remote_close();
 };
 
-// Event to download the image 
+// Event to download the image
 download.onclick = (event) => {
 	event.preventDefault();
-	ipcRenderer.send('download', {
-		'url': drag.getAttribute('src')
-	});
+	remote_download(drag.getAttribute('src'));
 };
 
 // Event to copy the markdown code
 markdown.onclick = (event) => {
 	event.preventDefault();
 	let img;
-	alert.setAttribute('style','display:inline-flex;');
-	drag.classList.add('image-blur'); 
+	alert.setAttribute('style', 'display:inline-flex;');
+	drag.classList.add('image-blur');
 
-	if(document.getElementsByClassName('image-original')[0]){
+	if (document.getElementsByClassName('image-original')[0]) {
 		img = canvas.getDataUrl(drag);
-	}
-	else{
+	} else {
 		img = canvas.getOriginalDataUrl(drag);
 	}
 
-	imgur.unploadImage(img).then((body)=>{
-		alert.setAttribute('style','display:none;');
+	imgur.unploadImage(img).then((body) => {
+		alert.setAttribute('style', 'display:none;');
 		drag.classList.remove('image-blur');
 		const data = JSON.parse(body).data;
-		ipcRenderer.send('markdown', {
-			'url': data.link
-		});
+		remote_markdown(data.link);
 		markdownAnimate();
 	});
 };
@@ -100,54 +94,66 @@ original.onclick = (event) => {
 	drag.classList.toggle('image-canvas');
 };
 
-// Event to start image dragging 
+// Event to start image dragging
 drag.ondragstart = (event) => {
-	event.preventDefault();
-	if(document.getElementsByClassName('image-original')[0]){
-		ipcRenderer.send('ondragstart', canvas.getDataUrl(event.currentTarget));
+	// event.preventDefault();
+	let datauri;
+	if (document.getElementsByClassName('image-original')[0]) {
+		datauri = canvas.getDataUrl(event.currentTarget);
+		// event.dataTransfer.setData('DownloadURL', `application/octet-stream:data.png:data:application/octet-stream;base64,${canvas.getDataUrl(event.currentTarget)}`);
+		// remote_ondragstart(canvas.getDataUrl(event.currentTarget));
+	} else {
+		datauri = canvas.getOriginalDataUrl(event.currentTarget);
+		// event.dataTransfer.setData('DownloadURL', `application/octet-stream:data.png:data:application/octet-stream;base64,${}`);
+		// remote_ondragstart(canvas.getOriginalDataUrl(event.currentTarget));
 	}
-	else{
-		ipcRenderer.send('ondragstart', canvas.getOriginalDataUrl(event.currentTarget));
-	}
+	event.dataTransfer.clearData();
+	const blob = imgur.dataURItoBlob(datauri);
+	const file = new File([blob], 'image.png');
+	// event.dataTransfer.setData('URL', datauri);
+	const datadownloaduri = datauri.split('data:')[1];
+	event.dataTransfer.setData('DownloadURL', datauri.split('data:')[1]);
+	console.log(datadownloaduri.slice(0, 100));
+	event.dataTransfer.items.add(file);
+
 };
 
 // Event to check if image loaded
-drag.onload= (event) => {
+drag.onload = (event) => {
 	event.preventDefault();
-	alert.setAttribute('style','display:none;');
-	drag.classList.remove('image-blur'); 
+	alert.setAttribute('style', 'display:none;');
+	drag.classList.remove('image-blur');
 };
 
 // Function to fetch image from unsplash
-const loadImage = (keyword)=>{
+const loadImage = (keyword) => {
 
-	alert.setAttribute('style','display:inline-flex;');
-	drag.classList.add('image-blur'); 
+	alert.setAttribute('style', 'display:inline-flex;');
+	drag.classList.add('image-blur');
 
-	if(keyword){
+	if (keyword) {
 		unsplash.fetchFromKeyword(keyword).then((url) => {
 			drag.setAttribute('src', url);
 		});
-	}
-	else{
+	} else {
 		unsplash.fetchRandom().then((url) => {
-			drag.setAttribute('src',url);
+			drag.setAttribute('src', url);
 		});
 	}
 };
 
 // Function to do animation for markdown code successfully copied
-const markdownAnimate = ()=>{
+const markdownAnimate = () => {
 
-	alert.setAttribute('style','display:inline-flex;');
-	loader.setAttribute('style','display:none;');
-	message.setAttribute('style','display:block;');
-	drag.classList.add('image-blur'); 
-	
+	alert.setAttribute('style', 'display:inline-flex;');
+	loader.setAttribute('style', 'display:none;');
+	message.setAttribute('style', 'display:block;');
+	drag.classList.add('image-blur');
+
 	setTimeout(() => {
-		alert.setAttribute('style','display:none;');
-		loader.setAttribute('style','display:block;');
-		message.setAttribute('style','display:none;');
-		drag.classList.remove('image-blur'); 
+		alert.setAttribute('style', 'display:none;');
+		loader.setAttribute('style', 'display:block;');
+		message.setAttribute('style', 'display:none;');
+		drag.classList.remove('image-blur');
 	}, 2000);
 };

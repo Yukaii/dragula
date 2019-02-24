@@ -1,81 +1,92 @@
 'use strict';
 
-// Dependencies
-const electron = require('electron');
-const { app, BrowserWindow, ipcMain, nativeImage, clipboard } = require('electron');
-const { download } = require('electron-dl');
-
 // Native imports
 const fs = require('fs');
 const path = require('path');
 
-// Global Variables
-let win;
-let display, width, height;
+// Dependencies
+const carlo = require('carlo');
 
-//Function to create app window
-function createWindow() {
-	display = electron.screen.getPrimaryDisplay();
-	width = display.bounds.width;
-	height = display.bounds.height;
-	// Create the browser window.
-	win = new BrowserWindow({
+// Global Variables
+let app;
+
+async function run () {
+	app = await carlo.launch({
 		width: 100,
 		height: 50,
-		movable: false,
-		resizable: false,
-		x: width - 20,
-		y: height - 20,
-		frame: false,
-		autoHideMenuBar: true,
-		alwaysOnTop: true
+		channel: ['canary', 'stable'],
+		title: 'Dragula',
 	});
 
-	// and load the index.html of the app.
-	win.loadFile('app/index.html');
+	app.on('exit', () => process.exit());
+	app.serveFolder(path.join(__dirname, 'out'));
+
+	await app.exposeFunction('remote_open', open);
+	await app.exposeFunction('remote_close', close);
+	await app.exposeFunction('remote_download', download);
+	await app.exposeFunction('remote_markdown', markdown);
+	await app.exposeFunction('remote_ondragstart', ondragstart);
+
+	await app.load('index.html');
+	return app;
 }
 
-// Function to handle native drag and drop
-ipcMain.on('ondragstart', (event, filePath) => {
-	let file = nativeImage.createFromDataURL(filePath);
+run();
 
-	fs.writeFile('image.png', file.toPNG(), () => {
-		event.sender.startDrag({
-			file: path.join(__dirname + '/image.png'),
-			icon: file
-		});
-	});
-});
+function download () {
 
-// Function to handle native download
-ipcMain.on('download', (event,args) => {
-	download(BrowserWindow.getFocusedWindow(),args.url);
-});
+}
 
-// Function to copy markdown code to clipboard
-ipcMain.on('markdown', (event,args) => {
-	clipboard.writeText('![alt data]('+ args.url+')');
-});
+function ondragstart () {
+}
 
-// Function to resize window when main window opens
-ipcMain.on('open', () => {
-	win.setBounds({
+function markdown () {
+
+}
+
+async function open () {
+	const win = app.mainWindow();
+	const { left, top } = await win.bounds();
+
+	await win.setBounds({
 		width: 300,
 		height: 200,
-		x: width - 310,
-		y: height - 280,
-	}, true);
-});
+		left: left - 200,
+		top: top - 150
+	});
+}
 
-// Function to resize window when main window closes
-ipcMain.on('close', () => {
+async function close () {
+	const win = app.mainWindow();
+	const { left, top } = await win.bounds();
+
 	win.setBounds({
 		width: 100,
 		height: 50,
-		x: width - 110,
-		y: height - 130
-	}, true);
-});
+		left: left + 200,
+		top: top + 150
+	});
+}
 
-// App ready event
-app.on('ready', createWindow);
+// // Function to handle native drag and drop
+// ipcMain.on('ondragstart', (event, filePath) => {
+// 	let file = nativeImage.createFromDataURL(filePath);
+
+// 	fs.writeFile('image.png', file.toPNG(), () => {
+// 		event.sender.startDrag({
+// 			file: path.join(__dirname + '/image.png'),
+// 			icon: file
+// 		});
+// 	});
+// });
+
+// // Function to handle native download
+// ipcMain.on('download', (event,args) => {
+// 	download(BrowserWindow.getFocusedWindow(),args.url);
+// });
+
+// // Function to copy markdown code to clipboard
+// ipcMain.on('markdown', (event,args) => {
+// 	clipboard.writeText('![alt data]('+ args.url+')');
+// });
+

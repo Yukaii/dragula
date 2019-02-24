@@ -1,10 +1,8 @@
 'use strict';
 
-const fetch =  require('node-fetch');
-
 /**
  * This is function gets random image from unsplash using Source Api.
- * @param {null} 
+ * @param {null}
  * @returns {string} link to image
  */
 const fetchRandom = () => {
