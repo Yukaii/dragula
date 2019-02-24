@@ -4,14 +4,19 @@
   "description": "🦇 A simple toolbar to drag and drop images from unsplash on the go.",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "node main.js",
+    "build:watch": "webpack --watch"
   },
   "author": "Sarthology",
   "license": "ISC",
   "devDependencies": {
-    "eslint": "^5.12.0"
+    "copy-webpack-plugin": "^5.0.0",
+    "eslint": "^5.12.0",
+    "webpack": "^4.29.5",
+    "webpack-cli": "^3.2.3"
   },
   "dependencies": {
+    "carlo": "^0.9.43",
     "electron": "^4.0.1",
     "electron-dl": "^1.12.0",
     "node-fetch": "^2.3.0",
