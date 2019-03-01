@@ -23,6 +23,7 @@ async function run () {
 		height: 200,
 		channel: ['canary', 'stable'],
 		title: 'Dragula',
+		icon: 'out/assets/dracula.png'
 	});
 
 	app.on('exit', () => process.exit());
