@@ -10,6 +10,7 @@ const clipboardy = require('clipboardy');
 const imageDataURI = require('image-data-uri');
 const tempy = require('tempy');
 const carlo = require('carlo');
+const PowerShell = require('powershell');
 
 const osType = os.type();
 
@@ -50,17 +51,28 @@ function copyImage (datauri) {
 	fs.writeFileSync(tempfile, dataBuffer);
 
 	// copy the file to clipboard
+	let args;
 	switch (osType) {
 	case 'Darwin':
-		var args = [
+		args = [
 			'-e',
 			`set the clipboard to (read (POSIX file"${tempfile}") as JPEG picture)`
 		];
 		childProcess.spawnSync('osascript', args);
 		break;
 	case 'Linux':
+		args = [
+			'-selection',
+			'clipboard',
+			'-t',
+			imageType,
+			'-i',
+			tempfile
+		];
+		childProcess.spawnSync('xclip', args);
 		break;
 	case 'Windows_NT':
+		new PowerShell(`Set-Clipboard -LiteralPath ${tempfile}`);
 		break;
 	default:
 		break;
@@ -68,7 +80,7 @@ function copyImage (datauri) {
 }
 
 function markdown (link) {
-	clipboardy.writeSync(`![](${link})`);
+	clipboardy.writeSync(`![alt data](${link})`);
 }
 
 async function open () {
@@ -95,25 +107,7 @@ async function close () {
 	});
 }
 
-// // Function to handle native drag and drop
-// ipcMain.on('ondragstart', (event, filePath) => {
-// 	let file = nativeImage.createFromDataURL(filePath);
-
-// 	fs.writeFile('image.png', file.toPNG(), () => {
-// 		event.sender.startDrag({
-// 			file: path.join(__dirname + '/image.png'),
-// 			icon: file
-// 		});
-// 	});
-// });
-
 // // Function to handle native download
 // ipcMain.on('download', (event,args) => {
 // 	download(BrowserWindow.getFocusedWindow(),args.url);
 // });
-
-// // Function to copy markdown code to clipboard
-// ipcMain.on('markdown', (event,args) => {
-// 	clipboard.writeText('![alt data]('+ args.url+')');
-// });
-

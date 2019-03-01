@@ -22,6 +22,7 @@
     "electron-dl": "^1.12.0",
     "image-data-uri": "^2.0.0",
     "node-fetch": "^2.3.0",
+    "powershell": "^2.3.1",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
     "tempy": "^0.2.1"
