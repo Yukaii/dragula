@@ -8,7 +8,8 @@
     "build:watch": "webpack --watch",
     "build": "cross-env NODE_ENV=production webpack",
     "package": "pkg package.json --out-path out",
-    "bundle": "npm run build && npm run package"
+    "bundle": "npm run build && npm run package",
+    "postinstall": "npm run build"
   },
   "bin": {
     "dragula": "./main.js"
