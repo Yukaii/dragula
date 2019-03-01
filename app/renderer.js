@@ -95,7 +95,7 @@ original.onclick = (event) => {
 	drag.classList.toggle('image-canvas');
 };
 
-// Event to start image dragging
+// Copy image to clipboard
 clipboard.onclick = (event) => {
 	event.preventDefault();
 	let datauri;
@@ -106,6 +106,7 @@ clipboard.onclick = (event) => {
 		datauri = canvas.getOriginalDataUrl(image);
 	}
 	remote_copyimage(datauri);
+	markdownAnimate();
 };
 
 // Event to check if image loaded
