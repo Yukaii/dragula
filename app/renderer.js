@@ -1,5 +1,5 @@
 'use strict';
-/* global remote_close, remote_download, remote_markdown, remote_copyimage, remote_open  */
+/* global remote_download, remote_markdown, remote_copyimage  */
 
 // Module imports
 const unsplash = require('./util/unsplash');
@@ -8,11 +8,9 @@ const imgur = require('./util/imgur');
 
 
 //Variables for Dom references
-const enter = document.getElementById('enter');
 const reload = document.getElementById('reload');
 const keyword = document.getElementById('keyword');
 const drag = document.getElementById('drag');
-const minimize = document.getElementById('minimize');
 const download = document.getElementById('download');
 const markdown = document.getElementById('markdown');
 const clipboard = document.getElementById('clipboard');
@@ -20,23 +18,6 @@ const original = document.getElementById('original');
 const alert = document.getElementById('alert');
 const loader = document.getElementById('loader');
 const message = document.getElementById('message');
-const main = document.getElementById('main');
-
-
-
-// Event to open main window
-enter.onclick = (event) => {
-	event.preventDefault();
-
-	if (!drag.getAttribute('src')) {
-		loadImage();
-	}
-
-	main.style = 'display:inline-flex;';
-	enter.style = 'display:none';
-
-	remote_open();
-};
 
 // Event to search image by keyword
 keyword.onkeydown = (event) => {
@@ -50,14 +31,6 @@ reload.onclick = (event) => {
 	event.preventDefault();
 
 	loadImage(keyword.value);
-};
-
-// Event to minimize main window
-minimize.onclick = (event) => {
-	event.preventDefault();
-	main.style = 'display:none';
-	enter.style = 'display:block';
-	remote_close();
 };
 
 // Event to download the image
@@ -130,6 +103,12 @@ const loadImage = (keyword) => {
 		unsplash.fetchRandom().then((url) => {
 			drag.setAttribute('src', url);
 		});
+	}
+};
+
+window.onload = function () {
+	if (!drag.getAttribute('src')) {
+		loadImage();
 	}
 };
 

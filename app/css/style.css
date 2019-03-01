@@ -40,11 +40,11 @@ input:focus {
   background: #00000080;
   color: white;
   display: grid;
-  grid-template-columns: 1fr 5fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 5fr 1fr 1fr 1fr;
 }
 
 .main {
-  display: none;
+  display: inline-flex;
   overflow: hidden;
   width: 300px;
   height: 200px;

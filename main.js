@@ -19,8 +19,8 @@ let app;
 
 async function run () {
 	app = await carlo.launch({
-		width: 100,
-		height: 50,
+		width: 300,
+		height: 200,
 		channel: ['canary', 'stable'],
 		title: 'Dragula',
 	});
@@ -101,7 +101,7 @@ async function close () {
 
 	win.setBounds({
 		width: 100,
-		height: 50,
+		height: 80,
 		left: left + 200,
 		top: top + 150
 	});
