@@ -1,5 +1,5 @@
 'use strict';
-/* global remote_close, remote_download, remote_markdown, remote_ondragstart, remote_open  */
+/* global remote_close, remote_download, remote_markdown, remote_copyimage, remote_open  */
 
 // Module imports
 const unsplash = require('./util/unsplash');
@@ -15,6 +15,7 @@ const drag = document.getElementById('drag');
 const minimize = document.getElementById('minimize');
 const download = document.getElementById('download');
 const markdown = document.getElementById('markdown');
+const clipboard = document.getElementById('clipboard');
 const original = document.getElementById('original');
 const alert = document.getElementById('alert');
 const loader = document.getElementById('loader');
@@ -95,27 +96,16 @@ original.onclick = (event) => {
 };
 
 // Event to start image dragging
-drag.ondragstart = (event) => {
-	// event.preventDefault();
+clipboard.onclick = (event) => {
+	event.preventDefault();
 	let datauri;
+	const image = document.querySelector('img#drag');
 	if (document.getElementsByClassName('image-original')[0]) {
-		datauri = canvas.getDataUrl(event.currentTarget);
-		// event.dataTransfer.setData('DownloadURL', `application/octet-stream:data.png:data:application/octet-stream;base64,${canvas.getDataUrl(event.currentTarget)}`);
-		// remote_ondragstart(canvas.getDataUrl(event.currentTarget));
+		datauri = canvas.getDataUrl(image);
 	} else {
-		datauri = canvas.getOriginalDataUrl(event.currentTarget);
-		// event.dataTransfer.setData('DownloadURL', `application/octet-stream:data.png:data:application/octet-stream;base64,${}`);
-		// remote_ondragstart(canvas.getOriginalDataUrl(event.currentTarget));
+		datauri = canvas.getOriginalDataUrl(image);
 	}
-	event.dataTransfer.clearData();
-	const blob = imgur.dataURItoBlob(datauri);
-	const file = new File([blob], 'image.png');
-	// event.dataTransfer.setData('URL', datauri);
-	const datadownloaduri = datauri.split('data:')[1];
-	event.dataTransfer.setData('DownloadURL', datauri.split('data:')[1]);
-	console.log(datadownloaduri.slice(0, 100));
-	event.dataTransfer.items.add(file);
-
+	remote_copyimage(datauri);
 };
 
 // Event to check if image loaded

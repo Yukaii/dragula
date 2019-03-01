@@ -2,11 +2,16 @@
 
 // Native imports
 const fs = require('fs');
-const clipboardy = require('clipboardy');
+const os = require('os');
 const path = require('path');
+const childProcess = require('child_process');
 
-// Dependencies
+const clipboardy = require('clipboardy');
+const imageDataURI = require('image-data-uri');
+const tempy = require('tempy');
 const carlo = require('carlo');
+
+const osType = os.type();
 
 // Global Variables
 let app;
@@ -26,7 +31,7 @@ async function run () {
 	await app.exposeFunction('remote_close', close);
 	await app.exposeFunction('remote_download', download);
 	await app.exposeFunction('remote_markdown', markdown);
-	await app.exposeFunction('remote_ondragstart', ondragstart);
+	await app.exposeFunction('remote_copyimage', copyImage);
 
 	await app.load('index.html');
 	return app;
@@ -38,7 +43,28 @@ function download () {
 
 }
 
-function ondragstart () {
+function copyImage (datauri) {
+	const { imageType, dataBuffer } = imageDataURI.decode(datauri);
+	let ext = imageType.replace(/^image\//, '');
+	const tempfile = tempy.file({ extension: ext });
+	fs.writeFileSync(tempfile, dataBuffer);
+
+	// copy the file to clipboard
+	switch (osType) {
+	case 'Darwin':
+		var args = [
+			'-e',
+			`set the clipboard to (read (POSIX file"${tempfile}") as JPEG picture)`
+		];
+		childProcess.spawnSync('osascript', args);
+		break;
+	case 'Linux':
+		break;
+	case 'Windows_NT':
+		break;
+	default:
+		break;
+	}
 }
 
 function markdown (link) {
