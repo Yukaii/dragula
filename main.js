@@ -2,6 +2,7 @@
 
 // Native imports
 const fs = require('fs');
+const clipboardy = require('clipboardy');
 const path = require('path');
 
 // Dependencies
@@ -40,8 +41,8 @@ function download () {
 function ondragstart () {
 }
 
-function markdown () {
-
+function markdown (link) {
+	clipboardy.writeSync(`![](${link})`);
 }
 
 async function open () {

@@ -78,10 +78,10 @@ markdown.onclick = (event) => {
 		img = canvas.getOriginalDataUrl(drag);
 	}
 
-	imgur.unploadImage(img).then((body) => {
+	imgur.unploadImage(img).then(res => res.json()).then((body) => {
 		alert.setAttribute('style', 'display:none;');
 		drag.classList.remove('image-blur');
-		const data = JSON.parse(body).data;
+		const { data } = body;
 		remote_markdown(data.link);
 		markdownAnimate();
 	});
