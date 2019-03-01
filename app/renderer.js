@@ -1,8 +1,8 @@
 'use strict';
-/* global remote_download, remote_markdown, remote_copyimage  */
+/* global remote_markdown, remote_copyimage  */
 
 // Module imports
-import { saveAs } from 'file-saver';
+const { saveAs } = require('file-saver');
 const unsplash = require('./util/unsplash');
 const canvas = require('./util/canvas');
 const imgur = require('./util/imgur');
@@ -37,7 +37,7 @@ reload.onclick = (event) => {
 // Event to download the image
 download.onclick = (event) => {
 	event.preventDefault();
-	saveAs(drag.getAttribute('src'), 'image.png')
+	saveAs(drag.getAttribute('src'), 'image.png');
 };
 
 // Event to copy the markdown code

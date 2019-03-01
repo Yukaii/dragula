@@ -5,27 +5,34 @@
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
-    "build:watch": "webpack --watch"
+    "build:watch": "webpack --watch",
+    "build": "cross-env NODE_ENV=production webpack",
+    "package": "pkg package.json --out-path out",
+    "bundle": "npm run build && npm run package"
+  },
+  "bin": {
+    "dragula": "./main.js"
+  },
+  "pkg": {
+    "scripts": "*.js",
+    "assets": "out/**/*"
   },
   "author": "Sarthology",
   "license": "ISC",
   "devDependencies": {
     "copy-webpack-plugin": "^5.0.0",
+    "cross-env": "^5.2.0",
     "eslint": "^5.12.0",
+    "pkg": "^4.3.7",
     "webpack": "^4.29.5",
     "webpack-cli": "^3.2.3"
   },
   "dependencies": {
     "carlo": "^0.9.43",
     "clipboardy": "^1.2.3",
-    "electron": "^4.0.1",
-    "electron-dl": "^1.12.0",
     "file-saver": "^2.0.1",
     "image-data-uri": "^2.0.0",
-    "node-fetch": "^2.3.0",
     "powershell": "^2.3.1",
-    "request": "^2.88.0",
-    "request-promise-native": "^1.0.7",
     "tempy": "^0.2.1"
   }
 }

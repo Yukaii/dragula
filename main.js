@@ -23,7 +23,8 @@ async function run () {
 		height: 200,
 		channel: ['canary', 'stable'],
 		title: 'Dragula',
-		icon: 'out/assets/dracula.png'
+		icon: 'out/assets/dracula.png',
+		localDataDir: path.join(os.homedir(), '.carlo-dragula'),
 	});
 
 	app.on('exit', () => process.exit());
